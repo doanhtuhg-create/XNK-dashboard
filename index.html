@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard XNK Việt Nam - Tháng 3/2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --card: #111827;
+  --card-border: #1e293b;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --accent: #38bdf8;
+  --red: #ef4444;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --purple: #a78bfa;
+  --pink: #f472b6;
+  --cyan: #06b6d4;
+  --xk-color: #38bdf8;
+  --nk-color: #f472b6;
+  --cctm-pos: #22c55e;
+  --cctm-neg: #ef4444;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Be Vietnam Pro',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+.dashboard { max-width:1400px; margin:0 auto; padding:20px; }
+
+/* Header */
+.header { text-align:center; padding:30px 0 20px; position:relative; }
+.header::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:3px; background:linear-gradient(90deg,var(--xk-color),var(--nk-color)); border-radius:2px; }
+.header h1 { font-size:28px; font-weight:800; background:linear-gradient(135deg,#38bdf8,#a78bfa,#f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-0.5px; }
+.header .subtitle { color:var(--text-dim); font-size:13px; margin-top:6px; font-weight:300; }
+.header .period { display:inline-block; margin-top:10px; padding:5px 16px; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); border-radius:20px; font-size:12px; color:var(--accent); font-weight:500; }
+
+/* KPI Strip */
+.kpi-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:20px 0; }
+.kpi { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:16px; position:relative; overflow:hidden; }
+.kpi::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.kpi.xk::after { background:var(--xk-color); }
+.kpi.nk::after { background:var(--nk-color); }
+.kpi.cctm-pos::after { background:var(--cctm-pos); }
+.kpi.cctm-neg::after { background:var(--cctm-neg); }
+.kpi.fdi::after { background:var(--purple); }
+.kpi .label { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; }
+.kpi .value { font-size:24px; font-weight:700; margin:6px 0 4px; }
+.kpi .change { font-size:11px; font-weight:500; display:flex; gap:8px; flex-wrap:wrap; }
+.kpi .change span { padding:2px 6px; border-radius:4px; }
+.up { background:rgba(34,197,94,0.15); color:var(--green); }
+.down { background:rgba(239,68,68,0.15); color:var(--red); }
+
+/* Section */
+.section { margin:24px 0; }
+.section-title { font-size:14px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; padding-left:12px; border-left:3px solid var(--accent); }
+
+/* Charts Grid */
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.chart-card { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; }
+.chart-card.full { grid-column:1/-1; }
+.chart-title { font-size:13px; font-weight:600; margin-bottom:14px; color:var(--text); }
+
+/* SVG Charts */
+svg text { font-family:'Be Vietnam Pro',sans-serif; }
+
+/* Table */
+.data-table { width:100%; border-collapse:collapse; font-size:12px; }
+.data-table th { text-align:left; padding:8px 10px; color:var(--text-dim); font-weight:500; border-bottom:1px solid var(--card-border); font-size:11px; text-transform:uppercase; }
+.data-table td { padding:7px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
+.data-table tr:hover { background:rgba(56,189,248,0.05); }
+.bar-cell { display:flex; align-items:center; gap:8px; }
+.bar { height:6px; border-radius:3px; min-width:2px; }
+
+/* Insight Box */
+.insight-box { background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.08)); border:1px solid rgba(56,189,248,0.15); border-radius:12px; padding:20px; }
+.insight-box h3 { font-size:14px; font-weight:700; margin-bottom:12px; color:var(--accent); }
+.insight-box ul { list-style:none; }
+.insight-box li { padding:6px 0; font-size:12.5px; line-height:1.6; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.05); display:flex; gap:8px; }
+.insight-box li:last-child { border:none; }
+.insight-box li::before { content:'→'; color:var(--accent); font-weight:700; flex-shrink:0; }
+.tag { display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:600; }
+.tag-warn { background:rgba(245,158,11,0.2); color:var(--orange); }
+.tag-good { background:rgba(34,197,94,0.2); color:var(--green); }
+.tag-bad { background:rgba(239,68,68,0.2); color:var(--red); }
+
+/* Responsive */
+@media(max-width:768px){
+  .kpi-strip { grid-template-columns:1fr 1fr; }
+  .charts-grid { grid-template-columns:1fr; }
+  .kpi .value { font-size:20px; }
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>XUẤT NHẬP KHẨU VIỆT NAM</h1>
+  <div class="subtitle">Cập nhật số liệu & Phân tích xu hướng</div>
+  <div class="period">THÁNG 3/2026 — Dữ liệu đến 31.03.2026</div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi xk">
+    <div class="label">Xuất khẩu T3/2026</div>
+    <div class="value" style="color:var(--xk-color)">46.39 <small style="font-size:13px">tỷ USD</small></div>
+    <div class="change">
+      <span class="up">MoM +40.2%</span>
+      <span class="up">YoY +18.6%</span>
+    </div>
+  </div>
+  <div class="kpi nk">
+    <div class="label">Nhập khẩu T3/2026</div>
+    <div class="value" style="color:var(--nk-color)">46.97 <small style="font-size:13px">tỷ USD</small></div>
+    <div class="change">
+      <span class="up">MoM +37.7%</span>
+      <span class="up">YoY +26.0%</span>
+    </div>
+  </div>
+  <div class="kpi cctm-neg">
+    <div class="label">Cán cân thương mại</div>
+    <div class="value" style="color:var(--red)">-0.59 <small style="font-size:13px">tỷ USD</small></div>
+    <div class="change">
+      <span class="down">T3/2025: +1.84 tỷ</span>
+    </div>
+  </div>
+  <div class="kpi fdi">
+    <div class="label">Lũy kế 3T/2026</div>
+    <div class="value" style="color:var(--purple)">-3.38 <small style="font-size:13px">tỷ USD</small></div>
+    <div class="change">
+      <span class="down">3T/2025: +3.60 tỷ</span>
+      <span style="color:var(--text-dim);font-size:10px">XK: 122.7 | NK: 126.0</span>
+    </div>
+  </div>
+</div>
+
+<!-- FDI vs Trong nước -->
+<div class="kpi-strip" style="grid-template-columns:repeat(4,1fr);">
+  <div class="kpi" style="border-left:3px solid var(--accent);">
+    <div class="label">XK FDI</div>
+    <div class="value" style="font-size:20px;">37.31 <small style="font-size:11px">tỷ</small></div>
+    <div class="change"><span class="up">YoY +35.4%</span></div>
+  </div>
+  <div class="kpi" style="border-left:3px solid var(--orange);">
+    <div class="label">XK Trong nước</div>
+    <div class="value" style="font-size:20px;">9.08 <small style="font-size:11px">tỷ</small></div>
+    <div class="change"><span class="down">YoY -21.4%</span></div>
+  </div>
+  <div class="kpi" style="border-left:3px solid var(--pink);">
+    <div class="label">NK FDI</div>
+    <div class="value" style="font-size:20px;">33.35 <small style="font-size:11px">tỷ</small></div>
+    <div class="change"><span class="up">YoY +42.8%</span></div>
+  </div>
+  <div class="kpi" style="border-left:3px solid var(--cyan);">
+    <div class="label">NK Trong nước</div>
+    <div class="value" style="font-size:20px;">13.62 <small style="font-size:11px">tỷ</small></div>
+    <div class="change"><span class="down">YoY -2.2%</span></div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="section">
+  <div class="section-title">Biến động XNK & Cán cân thương mại</div>
+  <div class="charts-grid">
+
+    <!-- Monthly XK/NK Trend -->
+    <div class="chart-card full">
+      <div class="chart-title">Kim ngạch XNK theo tháng (tỷ USD) — 15 tháng gần nhất</div>
+      <svg viewBox="0 0 900 280" style="width:100%">
+        <defs>
+          <linearGradient id="xkGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="nkGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f472b6" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#f472b6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid -->
+        <g stroke="#1e293b" stroke-width="0.5">
+          <line x1="60" y1="30" x2="880" y2="30"/>
+          <line x1="60" y1="80" x2="880" y2="80"/>
+          <line x1="60" y1="130" x2="880" y2="130"/>
+          <line x1="60" y1="180" x2="880" y2="180"/>
+          <line x1="60" y1="230" x2="880" y2="230"/>
+        </g>
+        <!-- Y axis labels -->
+        <text x="55" y="34" fill="#64748b" font-size="10" text-anchor="end">50</text>
+        <text x="55" y="84" fill="#64748b" font-size="10" text-anchor="end">45</text>
+        <text x="55" y="134" fill="#64748b" font-size="10" text-anchor="end">40</text>
+        <text x="55" y="184" fill="#64748b" font-size="10" text-anchor="end">35</text>
+        <text x="55" y="234" fill="#64748b" font-size="10" text-anchor="end">30</text>
+        
+        <!-- Data: XK values for 15 months (Jan 2025 - Mar 2026) -->
+        <!-- Scale: 30-50 maps to y 230-30 => y = 230 - (val-30)*10 -->
+        <!-- XK: 33.09, 31.11, 38.51, 37.45, 39.60, 39.52, 42.29, 43.39, 42.67, 42.05, 39.11, 35.53, 43.19, 33.09, 46.39 -->
+        <!-- NK: 30.06, 32.66, 36.88, 36.87, 39.05, 36.66, 40.00, 39.67, 39.82, 39.45, 37.98, 35.01, 44.97, 34.10, 46.97 -->
+
+        <!-- XK area -->
+        <path d="M 115,199.1 L 170,218.9 225,114.9 280,124.5 335,96 390,100.8 445,57.1 500,46.1 555,53.3 610,59.5 665,88.9 720,144.7 775,38.1 830,199.1 885,23.9 L 885,230 115,230 Z" fill="url(#xkGrad)"/>
+        <!-- XK line -->
+        <polyline points="115,199.1 170,218.9 225,114.9 280,124.5 335,96 390,100.8 445,57.1 500,46.1 555,53.3 610,59.5 665,88.9 720,144.7 775,38.1 830,199.1 885,23.9" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
+
+        <!-- NK area -->
+        <path d="M 115,229.4 L 170,173.4 225,81.2 280,81.3 335,69.5 390,133.4 445,30 500,33.3 555,31.8 610,35.5 665,70.2 720,149.9 775,20.3 830,189 885,19.7 L 885,230 115,230 Z" fill="url(#nkGrad)"/>
+        <!-- NK line -->
+        <polyline points="115,229.4 170,173.4 225,81.2 280,81.3 335,69.5 390,133.4 445,30 500,33.3 555,31.8 610,35.5 665,70.2 720,149.9 775,20.3 830,189 885,19.7" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6,3"/>
+
+        <!-- XK dots on key months -->
+        <circle cx="885" cy="23.9" r="4" fill="#38bdf8"/>
+        <circle cx="830" cy="199.1" r="3" fill="#38bdf8"/>
+        <circle cx="115" cy="199.1" r="3" fill="#38bdf8"/>
+        <!-- NK dots -->
+        <circle cx="885" cy="19.7" r="4" fill="#f472b6"/>
+
+        <!-- Value labels for T3 -->
+        <text x="885" y="16" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle">46.4</text>
+        <text x="885" y="44" fill="#f472b6" font-size="11" font-weight="700" text-anchor="end">47.0</text>
+
+        <!-- X axis labels -->
+        <text x="115" y="252" fill="#64748b" font-size="9" text-anchor="middle">T1/25</text>
+        <text x="170" y="252" fill="#64748b" font-size="9" text-anchor="middle">T2</text>
+        <text x="225" y="252" fill="#64748b" font-size="9" text-anchor="middle">T3</text>
+        <text x="280" y="252" fill="#64748b" font-size="9" text-anchor="middle">T4</text>
+        <text x="335" y="252" fill="#64748b" font-size="9" text-anchor="middle">T5</text>
+        <text x="390" y="252" fill="#64748b" font-size="9" text-anchor="middle">T6</text>
+        <text x="445" y="252" fill="#64748b" font-size="9" text-anchor="middle">T7</text>
+        <text x="500" y="252" fill="#64748b" font-size="9" text-anchor="middle">T8</text>
+        <text x="555" y="252" fill="#64748b" font-size="9" text-anchor="middle">T9</text>
+        <text x="610" y="252" fill="#64748b" font-size="9" text-anchor="middle">T10</text>
+        <text x="665" y="252" fill="#64748b" font-size="9" text-anchor="middle">T11</text>
+        <text x="720" y="252" fill="#64748b" font-size="9" text-anchor="middle">T12</text>
+        <text x="775" y="252" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">T1/26</text>
+        <text x="830" y="252" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">T2</text>
+        <text x="885" y="252" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle">T3</text>
+
+        <!-- Legend -->
+        <line x1="60" y1="270" x2="80" y2="270" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="84" y="273" fill="#94a3b8" font-size="10">Xuất khẩu</text>
+        <line x1="160" y1="270" x2="180" y2="270" stroke="#f472b6" stroke-width="2.5" stroke-dasharray="6,3"/>
+        <text x="184" y="273" fill="#94a3b8" font-size="10">Nhập khẩu</text>
+      </svg>
+    </div>
+
+    <!-- CCTM 3T so sánh qua các năm -->
+    <div class="chart-card">
+      <div class="chart-title">CCTM lũy kế 3 tháng đầu năm qua các năm (tỷ USD)</div>
+      <svg viewBox="0 0 400 220" style="width:100%">
+        <!-- bars for 2021-2026 -->
+        <!-- Values: 2021: +2.82, 2022: +1.48, 2023: +4.84, 2024: +7.81, 2025: +3.60, 2026: -3.38 -->
+        <!-- Scale: -4 to +8, center at y=150 (0 line), each unit = 12.5px -->
+        <line x1="50" y1="150" x2="380" y2="150" stroke="#475569" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="46" y="154" fill="#64748b" font-size="9" text-anchor="end">0</text>
+
+        <!-- 2021: +2.82 -->
+        <rect x="65" y="114.8" width="40" height="35.2" rx="4" fill="rgba(34,197,94,0.6)"/>
+        <text x="85" y="110" fill="#22c55e" font-size="10" font-weight="600" text-anchor="middle">+2.8</text>
+        <text x="85" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">2021</text>
+
+        <!-- 2022: +1.48 -->
+        <rect x="120" y="131.5" width="40" height="18.5" rx="4" fill="rgba(34,197,94,0.5)"/>
+        <text x="140" y="127" fill="#22c55e" font-size="10" font-weight="600" text-anchor="middle">+1.5</text>
+        <text x="140" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">2022</text>
+
+        <!-- 2023: +4.84 -->
+        <rect x="175" y="89.5" width="40" height="60.5" rx="4" fill="rgba(34,197,94,0.6)"/>
+        <text x="195" y="85" fill="#22c55e" font-size="10" font-weight="600" text-anchor="middle">+4.8</text>
+        <text x="195" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">2023</text>
+
+        <!-- 2024: +7.81 -->
+        <rect x="230" y="52.4" width="40" height="97.6" rx="4" fill="rgba(34,197,94,0.8)"/>
+        <text x="250" y="48" fill="#22c55e" font-size="10" font-weight="700" text-anchor="middle">+7.8</text>
+        <text x="250" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">2024</text>
+
+        <!-- 2025: +3.60 -->
+        <rect x="285" y="105" width="40" height="45" rx="4" fill="rgba(34,197,94,0.5)"/>
+        <text x="305" y="100" fill="#22c55e" font-size="10" font-weight="600" text-anchor="middle">+3.6</text>
+        <text x="305" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">2025</text>
+
+        <!-- 2026: -3.38 -->
+        <rect x="340" y="150" width="40" height="42.2" rx="4" fill="rgba(239,68,68,0.7)"/>
+        <text x="360" y="202" fill="#ef4444" font-size="10" font-weight="700" text-anchor="middle">-3.4</text>
+        <text x="360" y="210" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle">2026</text>
+      </svg>
+    </div>
+
+    <!-- YoY Growth comparison -->
+    <div class="chart-card">
+      <div class="chart-title">Tăng trưởng YoY — XK vs NK (6 tháng gần nhất)</div>
+      <svg viewBox="0 0 400 220" style="width:100%">
+        <!-- Grid -->
+        <line x1="50" y1="30" x2="380" y2="30" stroke="#1e293b" stroke-width="0.5"/>
+        <line x1="50" y1="80" x2="380" y2="80" stroke="#1e293b" stroke-width="0.5"/>
+        <line x1="50" y1="130" x2="380" y2="130" stroke="#1e293b" stroke-width="0.5"/>
+        <line x1="50" y1="180" x2="380" y2="180" stroke="#1e293b" stroke-width="0.5"/>
+        <text x="46" y="34" fill="#64748b" font-size="9" text-anchor="end">50%</text>
+        <text x="46" y="84" fill="#64748b" font-size="9" text-anchor="end">35%</text>
+        <text x="46" y="134" fill="#64748b" font-size="9" text-anchor="end">20%</text>
+        <text x="46" y="184" fill="#64748b" font-size="9" text-anchor="end">5%</text>
+
+        <!-- XK YoY: T10/25: 18.0%, T11/25: 15.9%, T12/25: 23.9%, T1/26: 29.7%, T2/26: 5.8%, T3/26: 18.6% -->
+        <!-- NK YoY: T10/25: 17.4%, T11/25: 16.3%, T12/25: 27.7%, T1/26: 49.2%, T2/26: 4.4%, T3/26: 26.0% -->
+        <!-- Scale: 0-50% maps to y 180-30 => y = 180 - val*3 -->
+
+        <polyline points="80,126 135,132.3 190,108.3 245,90.9 300,162.6 355,124.2" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
+        <polyline points="80,127.8 135,131.1 190,96.9 245,32.4 300,166.8 355,102" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6,3"/>
+
+        <!-- Dots -->
+        <circle cx="355" cy="124.2" r="4" fill="#38bdf8"/>
+        <circle cx="355" cy="102" r="4" fill="#f472b6"/>
+        <text x="365" y="121" fill="#38bdf8" font-size="9" font-weight="600">18.6%</text>
+        <text x="365" y="99" fill="#f472b6" font-size="9" font-weight="600">26.0%</text>
+
+        <text x="80" y="200" fill="#64748b" font-size="9" text-anchor="middle">T10</text>
+        <text x="135" y="200" fill="#64748b" font-size="9" text-anchor="middle">T11</text>
+        <text x="190" y="200" fill="#64748b" font-size="9" text-anchor="middle">T12</text>
+        <text x="245" y="200" fill="#94a3b8" font-size="9" text-anchor="middle">T1/26</text>
+        <text x="300" y="200" fill="#94a3b8" font-size="9" text-anchor="middle">T2</text>
+        <text x="355" y="200" fill="#e2e8f0" font-size="9" font-weight="600" text-anchor="middle">T3</text>
+
+        <line x1="60" y1="215" x2="80" y2="215" stroke="#38bdf8" stroke-width="2"/>
+        <text x="84" y="218" fill="#94a3b8" font-size="9">XK YoY</text>
+        <line x1="150" y1="215" x2="170" y2="215" stroke="#f472b6" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="174" y="218" fill="#94a3b8" font-size="9">NK YoY</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- XK by Commodity Group -->
+<div class="section">
+  <div class="section-title">Cơ cấu xuất khẩu T3/2026 theo nhóm hàng (tỷ USD)</div>
+  <div class="chart-card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Nhóm hàng</th><th style="text-align:right">T3/2026</th><th style="text-align:right">T3/2025</th><th style="text-align:right">YoY</th><th style="width:200px">Tỷ trọng XK</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Máy tính & Điện tử</td><td style="text-align:right;font-weight:600">13.00</td><td style="text-align:right">8.57</td><td style="text-align:right"><span class="up">+51.8%</span></td><td><div class="bar-cell"><div class="bar" style="width:140px;background:var(--accent)"></div><span style="font-size:10px;color:var(--text-dim)">28.0%</span></div></td></tr>
+        <tr><td>Dệt may & Giày dép</td><td style="text-align:right;font-weight:600">5.76</td><td style="text-align:right">5.56</td><td style="text-align:right"><span class="up">+3.7%</span></td><td><div class="bar-cell"><div class="bar" style="width:62px;background:var(--purple)"></div><span style="font-size:10px;color:var(--text-dim)">12.4%</span></div></td></tr>
+        <tr><td>Máy móc thiết bị</td><td style="text-align:right;font-weight:600">5.69</td><td style="text-align:right">4.67</td><td style="text-align:right"><span class="up">+21.9%</span></td><td><div class="bar-cell"><div class="bar" style="width:61px;background:var(--green)"></div><span style="font-size:10px;color:var(--text-dim)">12.3%</span></div></td></tr>
+        <tr><td>Điện thoại & LK</td><td style="text-align:right;font-weight:600">5.60</td><td style="text-align:right">4.82</td><td style="text-align:right"><span class="up">+16.1%</span></td><td><div class="bar-cell"><div class="bar" style="width:60px;background:var(--pink)"></div><span style="font-size:10px;color:var(--text-dim)">12.1%</span></div></td></tr>
+        <tr><td>Nông sản</td><td style="text-align:right;font-weight:600">3.67</td><td style="text-align:right">3.63</td><td style="text-align:right"><span class="up">+1.1%</span></td><td><div class="bar-cell"><div class="bar" style="width:40px;background:var(--orange)"></div><span style="font-size:10px;color:var(--text-dim)">7.9%</span></div></td></tr>
+        <tr><td>Hóa chất & Chất dẻo</td><td style="text-align:right;font-weight:600">2.10</td><td style="text-align:right">1.79</td><td style="text-align:right"><span class="up">+17.5%</span></td><td><div class="bar-cell"><div class="bar" style="width:23px;background:var(--cyan)"></div><span style="font-size:10px;color:var(--text-dim)">4.5%</span></div></td></tr>
+        <tr><td>Sắt thép & Kim loại</td><td style="text-align:right;font-weight:600">1.39</td><td style="text-align:right">1.64</td><td style="text-align:right"><span class="down">-15.2%</span></td><td><div class="bar-cell"><div class="bar" style="width:15px;background:#94a3b8"></div><span style="font-size:10px;color:var(--text-dim)">3.0%</span></div></td></tr>
+        <tr><td>Xăng dầu & Dầu thô</td><td style="text-align:right;font-weight:600">0.06</td><td style="text-align:right">0.25</td><td style="text-align:right"><span class="down">-75.2%</span></td><td><div class="bar-cell"><div class="bar" style="width:2px;background:#64748b"></div><span style="font-size:10px;color:var(--text-dim)">0.1%</span></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NK by Commodity Group -->
+<div class="section">
+  <div class="section-title">Nhập khẩu T3/2026 — Nhóm hàng nổi bật (tỷ USD)</div>
+  <div class="chart-card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Nhóm hàng</th><th style="text-align:right">T3/2026</th><th style="text-align:right">T3/2025</th><th style="text-align:right">YoY</th><th style="text-align:right">MoM</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Máy tính & Điện tử</td><td style="text-align:right;font-weight:600">17.61</td><td style="text-align:right">11.49</td><td style="text-align:right"><span class="up">+53.3%</span></td><td style="text-align:right"><span class="up">+35.0%</span></td></tr>
+        <tr><td>Máy móc thiết bị</td><td style="text-align:right;font-weight:600">5.55</td><td style="text-align:right">4.85</td><td style="text-align:right"><span class="up">+14.5%</span></td><td style="text-align:right"><span class="up">+37.2%</span></td></tr>
+        <tr><td>Hóa chất & Chất dẻo</td><td style="text-align:right;font-weight:600">4.34</td><td style="text-align:right">3.77</td><td style="text-align:right"><span class="up">+15.1%</span></td><td style="text-align:right"><span class="up">+49.6%</span></td></tr>
+        <tr><td>Sắt thép & Kim loại</td><td style="text-align:right;font-weight:600">3.80</td><td style="text-align:right">3.12</td><td style="text-align:right"><span class="up">+21.7%</span></td><td style="text-align:right"><span class="up">+28.4%</span></td></tr>
+        <tr><td>Xăng dầu & Dầu thô</td><td style="text-align:right;font-weight:600">2.35</td><td style="text-align:right">1.65</td><td style="text-align:right"><span class="up">+42.6%</span></td><td style="text-align:right"><span class="up">+45.0%</span></td></tr>
+        <tr><td>Dệt may & Giày dép</td><td style="text-align:right;font-weight:600">2.19</td><td style="text-align:right">2.53</td><td style="text-align:right"><span class="down">-13.4%</span></td><td style="text-align:right"><span class="up">+19.6%</span></td></tr>
+        <tr><td>Nông sản</td><td style="text-align:right;font-weight:600">1.96</td><td style="text-align:right">1.38</td><td style="text-align:right"><span class="up">+42.1%</span></td><td style="text-align:right"><span class="up">+47.9%</span></td></tr>
+        <tr><td>Điện thoại & LK</td><td style="text-align:right;font-weight:600">0.73</td><td style="text-align:right">0.87</td><td style="text-align:right"><span class="down">-15.6%</span></td><td style="text-align:right"><span class="up">+21.9%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CCTM Seasonality -->
+<div class="section">
+  <div class="section-title">Tính mùa vụ CCTM — So sánh T3 qua các năm (tỷ USD)</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">CCTM tháng 3 qua các năm</div>
+      <svg viewBox="0 0 400 180" style="width:100%">
+        <!-- Values T3: 2016: +0.62, 2017: -1.10, 2018: +2.25, 2019: +1.61, 2020: +2.00, 2021: +0.40, 2022: +2.00, 2023: +0.65, 2024: +2.93, 2025: +1.63 -->
+        <!-- BQ 2017-2025: +1.30 -->
+        <line x1="40" y1="90" x2="380" y2="90" stroke="#475569" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="36" y="94" fill="#64748b" font-size="9" text-anchor="end">0</text>
+        <!-- Scale: -2 to +4, y=90 is 0, each unit=22.5px -->
+
+        <rect x="55" y="76" width="25" height="14" rx="3" fill="rgba(34,197,94,0.5)"/>
+        <text x="67" y="72" fill="#94a3b8" font-size="8" text-anchor="middle">+0.6</text>
+        <text x="67" y="168" fill="#64748b" font-size="8" text-anchor="middle">'16</text>
+
+        <rect x="90" y="90" width="25" height="25" rx="3" fill="rgba(239,68,68,0.5)"/>
+        <text x="102" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">-1.1</text>
+        <text x="102" y="168" fill="#64748b" font-size="8" text-anchor="middle">'17</text>
+
+        <rect x="125" y="39" width="25" height="51" rx="3" fill="rgba(34,197,94,0.5)"/>
+        <text x="137" y="35" fill="#94a3b8" font-size="8" text-anchor="middle">+2.3</text>
+        <text x="137" y="168" fill="#64748b" font-size="8" text-anchor="middle">'18</text>
+
+        <rect x="160" y="54" width="25" height="36" rx="3" fill="rgba(34,197,94,0.5)"/>
+        <text x="172" y="50" fill="#94a3b8" font-size="8" text-anchor="middle">+1.6</text>
+        <text x="172" y="168" fill="#64748b" font-size="8" text-anchor="middle">'19</text>
+
+        <rect x="195" y="45" width="25" height="45" rx="3" fill="rgba(34,197,94,0.5)"/>
+        <text x="207" y="41" fill="#94a3b8" font-size="8" text-anchor="middle">+2.0</text>
+        <text x="207" y="168" fill="#64748b" font-size="8" text-anchor="middle">'20</text>
+
+        <rect x="230" y="81" width="25" height="9" rx="3" fill="rgba(34,197,94,0.4)"/>
+        <text x="242" y="77" fill="#94a3b8" font-size="8" text-anchor="middle">+0.4</text>
+        <text x="242" y="168" fill="#64748b" font-size="8" text-anchor="middle">'21</text>
+
+        <rect x="265" y="45" width="25" height="45" rx="3" fill="rgba(34,197,94,0.5)"/>
+        <text x="277" y="41" fill="#94a3b8" font-size="8" text-anchor="middle">+2.0</text>
+        <text x="277" y="168" fill="#64748b" font-size="8" text-anchor="middle">'22</text>
+
+        <rect x="300" y="75" width="25" height="15" rx="3" fill="rgba(34,197,94,0.4)"/>
+        <text x="312" y="71" fill="#94a3b8" font-size="8" text-anchor="middle">+0.7</text>
+        <text x="312" y="168" fill="#64748b" font-size="8" text-anchor="middle">'23</text>
+
+        <rect x="335" y="24" width="25" height="66" rx="3" fill="rgba(34,197,94,0.7)"/>
+        <text x="347" y="20" fill="#22c55e" font-size="8" font-weight="600" text-anchor="middle">+2.9</text>
+        <text x="347" y="168" fill="#64748b" font-size="8" text-anchor="middle">'24</text>
+
+        <!-- BQ line -->
+        <line x1="40" y1="61" x2="380" y2="61" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="384" y="64" fill="#f59e0b" font-size="8">BQ: +1.3</text>
+      </svg>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px;">T3 thường là tháng thặng dư. 2026 phá vỡ xu hướng này.</div>
+    </div>
+
+    <!-- FDI vs Trong nước CCTM -->
+    <div class="chart-card">
+      <div class="chart-title">CCTM theo khu vực — T3/2026</div>
+      <div style="display:flex;flex-direction:column;gap:20px;padding:10px 0;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--accent);">Khối FDI</span>
+            <span style="color:var(--green);font-weight:600;">+3.96 tỷ USD</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);height:18px;border-radius:9px;overflow:hidden;display:flex;">
+            <div style="width:52.8%;background:linear-gradient(90deg,rgba(56,189,248,0.4),rgba(56,189,248,0.7));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">XK: 37.3</div>
+            <div style="width:47.2%;background:linear-gradient(90deg,rgba(244,114,182,0.4),rgba(244,114,182,0.7));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">NK: 33.4</div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--orange);">Khối Trong nước</span>
+            <span style="color:var(--red);font-weight:600;">-4.54 tỷ USD</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);height:18px;border-radius:9px;overflow:hidden;display:flex;">
+            <div style="width:40%;background:linear-gradient(90deg,rgba(56,189,248,0.3),rgba(56,189,248,0.5));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">XK: 9.1</div>
+            <div style="width:60%;background:linear-gradient(90deg,rgba(244,114,182,0.3),rgba(244,114,182,0.5));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">NK: 13.6</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:10px;background:rgba(239,68,68,0.08);border-radius:8px;border-left:3px solid var(--red);">
+          <div style="font-size:11px;color:var(--text-dim);line-height:1.6;">
+            <strong style="color:var(--red);">Bất cân đối nghiêm trọng:</strong> Khối FDI tăng trưởng mạnh cả XK (+35.4%) và NK (+42.8%), thặng dư thu hẹp. Khối trong nước tiếp tục thâm hụt nặng với XK suy giảm -21.4% YoY.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSIGHTS & FORECAST -->
+<div class="section">
+  <div class="section-title">Nhận định & Dự báo</div>
+  <div class="charts-grid">
+    <div class="insight-box">
+      <h3>📊 Đánh giá Q1/2026</h3>
+      <ul>
+        <li>CCTM 3 tháng đầu năm thâm hụt <strong>-3.38 tỷ USD</strong>, đảo chiều mạnh so với thặng dư +3.60 tỷ cùng kỳ 2025 và +7.81 tỷ cùng kỳ 2024. <span class="tag tag-bad">Xấu nhất kể từ 2016</span></li>
+        <li><strong>Máy tính & Điện tử</strong> dẫn dắt cả XK (13 tỷ, +51.8% YoY) lẫn NK (17.6 tỷ, +53.3% YoY). NK vượt xa XK cho thấy chuỗi sản xuất đang nhập linh kiện mạnh — tín hiệu đơn hàng lớn sắp tới.</li>
+        <li>XK Nông sản tăng chậm (+1.1% YoY) nhưng cà phê tiếp tục là điểm sáng (987 triệu USD), trong khi gạo sụt giảm đáng kể.</li>
+        <li>XK Xăng dầu & Dầu thô gần như "biến mất" (61 triệu USD, giảm 75% YoY) — phản ánh giá dầu giảm và sản lượng khai thác thu hẹp.</li>
+        <li>Khối <strong>DN trong nước suy yếu</strong> rõ rệt: XK giảm 21.4% YoY, thâm hụt -4.54 tỷ USD riêng tháng 3. <span class="tag tag-warn">Cần theo dõi</span></li>
+      </ul>
+    </div>
+
+    <div class="insight-box">
+      <h3>🔮 Dự báo Q2/2026</h3>
+      <ul>
+        <li><strong>Mùa vụ tích cực:</strong> Theo quy luật 2017-2025, CCTM T4-T6 thường cải thiện dần. Trung bình T4 đạt thặng dư +0.33 tỷ, T6 đạt +1.30 tỷ.</li>
+        <li><strong>NK linh kiện điện tử tăng vọt</strong> trong Q1 thường báo hiệu XK thành phẩm bùng nổ trong Q2-Q3, đặc biệt nhóm Samsung, Intel, Foxconn. <span class="tag tag-good">Tín hiệu tốt</span></li>
+        <li><strong>Rủi ro:</strong> Nếu căng thẳng thương mại Mỹ-Trung leo thang, VN có thể hưởng lợi dịch chuyển đơn hàng nhưng cũng chịu rủi ro bị điều tra xuất xứ. NK nguyên liệu từ TQ tăng mạnh (+42.1% nông sản) cần giám sát.</li>
+        <li>Khối FDI sẽ tiếp tục dẫn dắt tăng trưởng (chiếm 80.4% XK). XK trong nước cần chính sách hỗ trợ khẩn cấp để phục hồi.</li>
+        <li><strong>Dự kiến Q2:</strong> CCTM có thể thu hẹp thâm hụt về mức -1 đến -2 tỷ USD/tháng, cải thiện dần nếu NK linh kiện chuyển hóa thành XK thành phẩm. <span class="tag tag-warn">Trung tính</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:20px;font-size:10px;color:#475569;">
+  Nguồn: Tổng cục Hải quan · Dữ liệu cập nhật đến 31/03/2026 · Dashboard by Claude
+</div>
+
+</div>
+</body>
+</html>
